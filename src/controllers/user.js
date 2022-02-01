@@ -1,13 +1,15 @@
-import User from "../models/User";
+import { successResponse, errorResponse } from "../utilities/response-builder";
+import RegisterUser from "../services/api/RegisterUser";
 
 export async function createUser(req, res) {
-  const user = new User(req.body);
   try {
-    await user.save();
-
-    res.status(201).send({});
-  } catch (err) {
-    console.log(err);
-    res.status(500).send(err);
+    const service = new RegisterUser(req.body);
+    const user = await service.call();
+    return successResponse(req, res, { user }, 201);
+  } catch (error) {
+    if (error.name === "MongoServerError" && error.code === 11000) {
+      error.message = "User already exists";
+    }
+    return errorResponse(req, res, error.message);
   }
 }
