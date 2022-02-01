@@ -13,3 +13,12 @@ export async function createUser(req, res) {
     return errorResponse(req, res, error.message);
   }
 }
+
+export async function loginUser(req, res) {
+  try {
+    // TODO: implementation
+    return successResponse(req, res, {}, 200);
+  } catch (error) {
+    return errorResponse(req, res, error.message);
+  }
+}

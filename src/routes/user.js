@@ -8,9 +8,15 @@ const router = new Router();
 const keyByField = true;
 
 router.post(
-  "/user",
+  "/users",
   validate(userValidation.createUser, { keyByField }),
   userController.createUser
+);
+
+router.post(
+  "/users/login",
+  validate(userValidation.loginUser, { keyByField }),
+  userController.loginUser
 );
 
 export default router;

@@ -8,49 +8,62 @@ const saltRounds = 10;
 
 const { name, phoneNumber, password } = validations;
 
-const userSchema = new mongoose.Schema({
-  name: {
-    first: {
+const userSchema = new mongoose.Schema(
+  {
+    name: {
+      first: {
+        type: String,
+        required: true,
+        trim: true,
+        match: [name.regex, name.message],
+      },
+      last: {
+        type: String,
+        required: true,
+        trim: true,
+        match: [name.regex, name.message],
+      },
+    },
+    phoneNumber: {
       type: String,
       required: true,
       trim: true,
-      match: [name.regex, name.message],
+      // unique: true,
+      match: [phoneNumber.regex, phoneNumber.message],
     },
-    last: {
+    email: {
       type: String,
       required: true,
       trim: true,
-      match: [name.regex, name.message],
+      lowercase: true,
+      // unique: true,
+      validate(value) {
+        const { error } = Joi.string().email().validate(value);
+        if (error) {
+          throw new Error(error);
+        }
+      },
+    },
+    password: {
+      type: String,
+      required: true,
+      trim: true,
+      match: [password.regex, password.message],
     },
   },
-  phoneNumber: {
-    type: String,
-    required: true,
-    trim: true,
-    unique: true,
-    match: [phoneNumber.regex, phoneNumber.message],
-  },
-  email: {
-    type: String,
-    required: true,
-    trim: true,
-    lowercase: true,
-    unique: true,
-    validate(value) {
-      const { error } = Joi.string().email().validate(value);
-      if (error) {
-        throw new Error(error);
-      }
-    },
-  },
-  password: {
-    type: String,
-    required: true,
-    trim: true,
-    match: [password.regex, password.message],
-  },
-});
+  {
+    timestamps: true,
+    id: false,
+  }
+);
 
+userSchema.methods.toJSON = function () {
+  const userObject = this.toObject();
+  delete userObject.password;
+  return userObject;
+};
+
+//Hash the plain text password before saving
 userSchema.pre("save", async function (next) {
   const user = this;
 
@@ -61,12 +74,18 @@ userSchema.pre("save", async function (next) {
   next();
 });
 
+userSchema.virtual("addresses", {
+  ref: "Address",
+  localField: "_id",
+  foreignField: "owner",
+});
+
 userSchema.virtual("fullName").get(function () {
   return `${this.name.first} ${this.name.last}`;
 });
 
-userSchema.set("toJSON", { getters: true, virtuals: true });
-userSchema.set("toObject", { getters: true, virtuals: true });
+userSchema.set("toJSON", { virtuals: true });
+userSchema.set("toObject", { virtuals: true });
 
 const User = mongoose.model("User", userSchema);
 

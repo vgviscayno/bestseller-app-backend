@@ -1,4 +1,4 @@
-import User from "../../models/User";
+import User from "../../models/user";
 import { errorResponse } from "../../utilities/response-builder";
 
 export const createUser = async (data) => {

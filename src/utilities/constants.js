@@ -11,6 +11,6 @@ export const validations = {
   password: {
     regex: /^(?=.*\d)(?=.*[A-Z])(?=.*[a-z])(?=.*[^\w\d\s:])([^\s]){8,16}$/,
     message:
-      "Password must have: (1) at least one lowercase and uppercase letter, (2) one non-alphanumeric character, (3) one numeric character",
+      '"password" must have: (1) at least one lowercase and uppercase letter, (2) one non-alphanumeric character, (3) one numeric character',
   },
 };
